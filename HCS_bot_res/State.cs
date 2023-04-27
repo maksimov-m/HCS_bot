@@ -9,6 +9,9 @@
         ReqEnterAdress,
         ReqEnterNumber,
         ReqEnterIncident,
-        ReqEnterYesNo
+        ReqEnterYesNo,
+        StartAdmin,
+        StartSendList,
+        SendListYesNo
     }
 }

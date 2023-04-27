@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.ReplyMarkups;
@@ -23,6 +24,8 @@ namespace HCS_bot_test
 
         Telegram.Bot.TelegramBotClient _client;
         private Dictionary<long, UserState> _clientState = new Dictionary<long, UserState>();
+
+        private List<long> admins_id = new List<long> { 1610733398, 821204845 };
 
         public TelegramBotHelper(string token)
         {
@@ -110,7 +113,7 @@ namespace HCS_bot_test
                                     {
                                         case "Адрес и телефон":
                                             _client.SendTextMessageAsync(update.Message.Chat.Id, "Г.Стерлитамак,ул.Ленина,12");
-                                            _client.SendTextMessageAsync(update.Message.Chat.Id, "+79999999999", replyMarkup: GetButtons());
+                                            _client.SendTextMessageAsync(update.Message.Chat.Id, "📱+79999999999", replyMarkup: GetButtons());
                                             _clientState[update.Message.Chat.Id] = null;
                                             break;
                                         case "Часы работы":
@@ -147,7 +150,7 @@ namespace HCS_bot_test
                                 else if (text == TEXT_LEAVE_REQ)
                                 {
                                     _client.SendTextMessageAsync(update.Message.Chat.Id, "Давайте заполним заявку.");
-                                    _client.SendTextMessageAsync(update.Message.Chat.Id, "Введите ФИО, как к Вам обращаться?");
+                                    _client.SendTextMessageAsync(update.Message.Chat.Id, "Введите ФИО, как к Вам обращаться?", replyMarkup: new ReplyKeyboardRemove());
                                     userRequets = new UserRequest();
                                     _clientState[update.Message.Chat.Id] = new UserState { State = State.ReqEnterFIO};
                                 }
@@ -198,6 +201,43 @@ namespace HCS_bot_test
                                     goto case State.StartReq;
                                 }
                                 break;
+                            //Admin panel
+                            case State.StartAdmin:
+                                switch (text)
+                                {
+                                    case "Рассылка":
+                                        _client.SendTextMessageAsync(update.Message.Chat.Id, "Введите текст, который Вы хотите разослать.", replyMarkup: new ReplyKeyboardRemove());
+                                        _clientState[update.Message.Chat.Id] = new UserState { State = State.StartSendList };
+                                        break;
+                                    case "Колличество пользователей":
+                                        int count_users = GetCountUsers();
+                                        _client.SendTextMessageAsync(update.Message.Chat.Id, $"Колличество пользователей:\n{count_users}", replyMarkup: GetAdminButtons());
+                                        break;
+                                    case "Выход":
+                                        _client.SendTextMessageAsync(update.Message.Chat.Id, $"Выберите:", replyMarkup: GetButtons());
+                                        _clientState[update.Message.Chat.Id] = null;
+                                        break;   
+                                    default:
+                                        break;
+                                }
+                                break;
+                            case State.StartSendList:
+                                _client.SendTextMessageAsync(update.Message.Chat.Id, $"Ваш текст:\n{text}");
+                                _client.SendTextMessageAsync(update.Message.Chat.Id, $"Все верно?", replyMarkup: GetYesNoButtons());
+                                _clientState[update.Message.Chat.Id] = new UserState { State = State.SendListYesNo };
+                                break;
+                            case State.SendListYesNo:
+                                if(text == "Да")
+                                {
+                                    SendMessagesAllUsers();
+                                    _client.SendTextMessageAsync(update.Message.Chat.Id, $"Сообщение успешно разослано.", replyMarkup: GetAdminButtons());
+                                    _clientState[update.Message.Chat.Id] = new UserState { State = State.StartAdmin };
+                                }
+                                else
+                                {
+                                    _clientState[update.Message.Chat.Id] = new UserState { State = State.StartSendList };
+                                }
+                                break;
                             default:
                                 break;
                         }
@@ -224,6 +264,7 @@ namespace HCS_bot_test
                                 
                                 break;
                             case TEXT_CONSULT:
+                                Console.WriteLine(update.Message.Chat.Id);
                                 _client.SendTextMessageAsync(update.Message.Chat.Id, "Выберите интересующий вопрос из списка:", replyMarkup: GetConsultButtons());
                                 _clientState[update.Message.Chat.Id] = new UserState { State = State.ChooseConsult};
                                 break;
@@ -231,7 +272,17 @@ namespace HCS_bot_test
                                 _client.SendTextMessageAsync(update.Message.Chat.Id, "Выберите то что Вам нужно:", replyMarkup: GetReqButtons());
                                 _clientState[update.Message.Chat.Id] = new UserState { State = State.StartReq};
                                 break;
-
+                            case "/admin":
+                                if (admins_id.Contains(update.Message.Chat.Id))
+                                {
+                                    _client.SendTextMessageAsync(update.Message.Chat.Id, "Добро пожалость в панель администратора.\nВыберите необходимое действие", replyMarkup: GetAdminButtons());
+                                    _clientState[update.Message.Chat.Id] = new UserState { State = State.StartAdmin };
+                                }
+                                else
+                                {
+                                    _client.SendTextMessageAsync(update.Message.Chat.Id, "Я не знаю такой команды.\nПовтори попытку.", replyMarkup: GetButtons());
+                                }
+                                break;
                             default:
                                 if (!UserLogin(update.Message.Chat.Id))
                                 {
@@ -254,6 +305,37 @@ namespace HCS_bot_test
                     break;
 
             }
+        }
+
+        private int GetCountUsers()
+        {
+            return -1;
+        }
+
+        private void SendMessagesAllUsers()
+        {
+            var a = GetUsers();
+            foreach (var user in a)
+            {
+                Console.WriteLine(user);
+            }
+            Console.WriteLine("Acces!");
+        }
+
+        private List<long> GetUsers()
+        {
+            return new List<long>{ 1610733398 };
+        }
+
+        private IReplyMarkup? GetAdminButtons()
+        {
+            List<List<KeyboardButton>> buttons = new List<List<KeyboardButton>>
+            {
+                new List<KeyboardButton>(){new KeyboardButton("Рассылка"), new KeyboardButton("Колличество пользователей") }
+            };
+            buttons.Add(new List<KeyboardButton> { new KeyboardButton("Выход") });
+            var rmu = new ReplyKeyboardMarkup(buttons) { ResizeKeyboard = true };
+            return rmu;
         }
 
         private void PutRequest(UserRequest userRequets)
