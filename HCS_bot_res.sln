@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32825.248
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HCS_bot_res", "HCS_bot_res\HCS_bot_res.csproj", "{59D3DADC-BF8A-4014-9BEA-BAD56FAEE794}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{59D3DADC-BF8A-4014-9BEA-BAD56FAEE794}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59D3DADC-BF8A-4014-9BEA-BAD56FAEE794}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59D3DADC-BF8A-4014-9BEA-BAD56FAEE794}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59D3DADC-BF8A-4014-9BEA-BAD56FAEE794}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D8F735E0-FE4B-4A82-9580-267E5E09D18B}
+	EndGlobalSection
+EndGlobal
