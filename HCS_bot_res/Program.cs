@@ -10,10 +10,10 @@ namespace HCS_bot_test
     {
         static void Main(string[] args)
         {
-            //6081288192:AAFJABHQMJ4bDrYRCkCZ-xR0ZoG3SUGX-5M
+            
             try
             {
-                TelegramBotHelper helper = new TelegramBotHelper(token: "6081288192:AAFJABHQMJ4bDrYRCkCZ-xR0ZoG3SUGX-5M");
+                TelegramBotHelper helper = new TelegramBotHelper(token: "TOKEN");
                 helper.GetUpdate();
             }
             catch (Exception ex)
